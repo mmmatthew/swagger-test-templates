@@ -81,7 +81,8 @@ function getData(swagger, apiPath, operation, response, config, info) {
     loadName: '',
     requests: 0,
     concurrent: 0,
-    pathParams: {}
+    pathParams: {},
+    testingParameters: {}
   };
 
   // get pathParams from config
@@ -89,6 +90,10 @@ function getData(swagger, apiPath, operation, response, config, info) {
     data.pathParams = config.pathParams;
   }
 
+  // get testingParameters from swagger
+  if (swagger.paths[apiPath][operation]['x-testing']){
+    data.testingParameters = swagger.paths[apiPath][operation]['x-testing'];
+  };
   // used for checking requestData table
   var requestPath = (swagger.basePath) ? path.posix.join(swagger.basePath, apiPath) : apiPath;
 
@@ -192,7 +197,7 @@ function getData(swagger, apiPath, operation, response, config, info) {
   if (config.testModule === 'request') {
     data.path = url.format({
       protocol: swagger.schemes !== undefined ? swagger.schemes[0] : 'http',
-      host: swagger.host !== undefined ? swagger.host : 'localhost:10010',
+      host: swagger.host !== undefined ? swagger.host : '127.0.0.1:8286',
       pathname: requestPath
     });
   } else {
@@ -429,7 +434,7 @@ function testGenPath(swagger, apiPath, config) {
     testmodule: config.testModule,
     customFormats: customFormats,
     scheme: (swagger.schemes !== undefined ? swagger.schemes[0] : 'http'),
-    host: (swagger.host !== undefined ? swagger.host : 'localhost:10010'),
+    host: (swagger.host !== undefined ? swagger.host : '127.0.0.1:8286'),
     tests: result,
     importValidator: info.importValidator,
     importEnv: info.importEnv,
@@ -550,6 +555,7 @@ handlebars.registerHelper('validateResponse', helpers.validateResponse);
 handlebars.registerHelper('length', helpers.length);
 handlebars.registerHelper('pathify', helpers.pathify);
 handlebars.registerHelper('printJSON', helpers.printJSON);
+handlebars.registerHelper('readValidationFile', helpers.readValidationFile);
 
 
 module.exports = {
