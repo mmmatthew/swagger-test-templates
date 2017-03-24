@@ -93,6 +93,20 @@ function getData(swagger, apiPath, operation, response, config, info) {
   // get testingParameters from swagger
   if (swagger.paths[apiPath][operation]['x-testing']){
     data.testingParameters = swagger.paths[apiPath][operation]['x-testing'];
+    data.testingParameters.contentTests.forEach(function(testScenario) {
+      // make sure that the validation, query, and path parameters are properly formatted
+      if (!_.isArray(testScenario.queryParameters)){
+        testScenario.queryParameters = []
+      }
+      // make sure that the validation, query, and path parameters are properly formatted
+      if (!_.isArray(testScenario.pathParameters)){
+        testScenario.pathParameters = []
+      }
+      // make sure that the validation, query, and path parameters are properly formatted
+      if (!fs.existsSync(helpers.readValidationFile(testScenario.validationFile))){
+        console.log('file does not exist: ' + testScenario.validationFile)
+      }
+    })
   };
   // used for checking requestData table
   var requestPath = (swagger.basePath) ? path.posix.join(swagger.basePath, apiPath) : apiPath;
